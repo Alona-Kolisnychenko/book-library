@@ -6,3 +6,10 @@ export const addBook = (newBook)=>{
         payload: newBook
     }
 }
+
+export const dellBook = (id)=>{
+    return{
+        type: actionTypes.DELL_BOOK,
+        payload: id
+    }
+}
