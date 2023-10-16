@@ -1,13 +1,14 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { BiTrashAlt } from 'react-icons/bi';
 import { BsBookmarkHeartFill, BsBookmarkHeart } from 'react-icons/bs'
-import { dellBook, toggleFavorite } from '../../redux/books/actionCreators';
+import { dellBook, toggleFavorite } from '../../redux/slices/booksSlice';
 import { selectTitleFilter, selectAuthorFilter, selectOnlyFavoriteFilter } from '../../redux/slices/filterSlice';
+import { selectBooks } from '../../redux/slices/booksSlice';
 import './BookList.css';
 
 
 const BookList = () => {
-  const books = useSelector((state) => state.books);
+  const books = useSelector(selectBooks);
   const titleFilter = useSelector(selectTitleFilter);
   const authorFilter = useSelector(selectAuthorFilter);
   const onlyFavoriteFilter = useSelector(selectOnlyFavoriteFilter); 
