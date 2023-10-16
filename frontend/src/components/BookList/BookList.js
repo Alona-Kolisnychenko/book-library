@@ -1,50 +1,57 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { BiTrashAlt } from 'react-icons/bi';
-import { BsBookmarkHeartFill, BsBookmarkHeart } from 'react-icons/bs'
+import { BsBookmarkHeartFill, BsBookmarkHeart } from 'react-icons/bs';
 import { dellBook, toggleFavorite } from '../../redux/slices/booksSlice';
-import { selectTitleFilter, selectAuthorFilter, selectOnlyFavoriteFilter } from '../../redux/slices/filterSlice';
+import {
+  selectTitleFilter,
+  selectAuthorFilter,
+  selectOnlyFavoriteFilter,
+} from '../../redux/slices/filterSlice';
 import { selectBooks } from '../../redux/slices/booksSlice';
 import './BookList.css';
-
 
 const BookList = () => {
   const books = useSelector(selectBooks);
   const titleFilter = useSelector(selectTitleFilter);
   const authorFilter = useSelector(selectAuthorFilter);
-  const onlyFavoriteFilter = useSelector(selectOnlyFavoriteFilter); 
+  const onlyFavoriteFilter = useSelector(selectOnlyFavoriteFilter);
   const dispatch = useDispatch();
- 
-  const filteredBooks = books.filter((book)=> {
-      const matchesTitle = book.title.toLowerCase().includes(titleFilter.toLowerCase());
-      const matchesAuthor = book.author.toLowerCase().includes(authorFilter.toLowerCase());
-      const matchesFavorite = onlyFavoriteFilter? book.isFavorite : true;
-     
-    return matchesTitle && matchesAuthor && matchesFavorite
-  }) 
+
+  const filteredBooks = books.filter((book) => {
+    const matchesTitle = book.title
+      .toLowerCase()
+      .includes(titleFilter.toLowerCase());
+    const matchesAuthor = book.author
+      .toLowerCase()
+      .includes(authorFilter.toLowerCase());
+    const matchesFavorite = onlyFavoriteFilter ? book.isFavorite : true;
+
+    return matchesTitle && matchesAuthor && matchesFavorite;
+  });
 
   const handleDeleteBook = (id) => {
     dispatch(dellBook(id));
   };
 
-  const handleToggleFavorite = (id)=>{
-    dispatch(toggleFavorite(id))
+  const handleToggleFavorite = (id) => {
+    dispatch(toggleFavorite(id));
   };
 
-  const hightLightMatch = (text, filter)=>{
-    if(!filter) return text;
+  const hightLightMatch = (text, filter) => {
+    if (!filter) return text;
     const regex = new RegExp(`(${filter})`, 'gi');
 
-    return text.split(regex).map((substring, i)=>{
-      if(substring.toLowerCase() === filter.toLowerCase()){
+    return text.split(regex).map((substring, i) => {
+      if (substring.toLowerCase() === filter.toLowerCase()) {
         return (
-          <span key={i} className='highlight'>
+          <span key={i} className="highlight">
             {substring}
           </span>
         );
       }
-      return substring
-    })
-  }
+      return substring;
+    });
+  };
   return (
     <div className="app-block book-list">
       <h2>Book List</h2>
@@ -55,16 +62,20 @@ const BookList = () => {
           {filteredBooks.map((book, i) => (
             <li key={book.id}>
               <div className="book-info">
-                {++i} {hightLightMatch(book.title, titleFilter)} by <strong>{hightLightMatch(book.author, authorFilter)}</strong>
+                {++i} {hightLightMatch(book.title, titleFilter)} by{' '}
+                <strong>{hightLightMatch(book.author, authorFilter)}</strong> 
+                {' '}
+                ({book.source})
               </div>
               <div className="book-actions">
-                <span onClick={()=>handleToggleFavorite(book.id)}>
-                {book.isFavorite
-                  ? <BsBookmarkHeartFill className='star-icon' />
-                  : <BsBookmarkHeart className='star-icon'/>
-                }
+                <span onClick={() => handleToggleFavorite(book.id)}>
+                  {book.isFavorite ? (
+                    <BsBookmarkHeartFill className="star-icon" />
+                  ) : (
+                    <BsBookmarkHeart className="star-icon" />
+                  )}
                 </span>
-                
+
                 <button onClick={() => handleDeleteBook(book.id)}>
                   <BiTrashAlt />
                 </button>
