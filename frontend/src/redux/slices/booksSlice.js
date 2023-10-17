@@ -3,7 +3,10 @@ import axios from 'axios';
 import { createBookWidthId } from '../../utils/createBookWidthId';
 import { setError } from './errorSlices';
 
-const initialState = [];
+const initialState = {
+  books: [],
+  isLoadingViaAPI: false
+};
 
 export const fetchBook = createAsyncThunk(
   'books/fetchBook',
@@ -23,35 +26,40 @@ const booksSlice = createSlice({
   initialState,
   reducers: {
     addBook: (state, action) => {
-      state.push(action.payload);
+      state.books.push(action.payload);
     },
     dellBook: (state, action) => {
-      return state.filter((book) => book.id !== action.payload);
+      return {
+        ...state, books: state.books.filter((book) => book.id !== action.payload)
+      }
+      
     },
     toggleFavorite: (state, action) => {
-      state.forEach((book) => {
+      state.books.forEach((book) => {
         if (book.id === action.payload) {
           book.isFavorite = !book.isFavorite;
         }
       });
-      // return state.map((book)=>
-      //     book.id === action.payload
-      //     ? {...book, isFavorite: !book.isFavorite}     //можна так
-      //     : book
-      // )
     },
   },
   extraReducers: {
-    [fetchBook.fulfilled]: (state, action) => {
+    [ fetchBook.pending ]: (state)=>{
+      state.isLoadingViaAPI = true
+    },
+    [ fetchBook.fulfilled ]: (state, action) => {
+      state.isLoadingViaAPI = false
       if (action.payload.title && action.payload.author) {
-        state.push(createBookWidthId(action.payload, 'API'));
+        state.books.push(createBookWidthId(action.payload, 'API'));
       }
+    },
+    [ fetchBook.rejected ]: (state)=>{
+      state.isLoadingViaAPI = false
     }
   }
   // extraReducers: (builder) => {
   //   builder.addCase(fetchBook.fulfilled, (state, action) => {
   //     if (action.payload.title && action.payload.author) {
-  //       state.push(createBookWidthId(action.payload, 'API'));
+  //       state.books.push(createBookWidthId(action.payload, 'API'));
   //     }
   //   });
   // },
@@ -59,6 +67,7 @@ const booksSlice = createSlice({
 
 export const { addBook, dellBook, toggleFavorite } = booksSlice.actions;
 
-export const selectBooks = (state) => state.books;
+export const selectBooks = (state) => state.books.books;
+export const selectIsLoadingViaAPI = (state)=> state.books.isLoadingViaAPI;
 
 export default booksSlice.reducer;
